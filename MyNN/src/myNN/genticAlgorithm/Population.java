@@ -32,6 +32,8 @@ public class Population {
 			int weights_count) {
 		fenotyp.createFenotyp(fenotyp_size, chromosom_size);
 		utworzeniePopulacjiPoczatkowej(fenotyp.getFenotyp(), pop_size, weights_count);
+		// noweTworzeniePopulacjiPoczatkowej(fenotyp.getFenotyp(), pop_size,
+		// weights_count);
 
 		for (Chromosom ch : getPopulacjaPoczatkowa()) {
 			ch.dekodowanieChromosomu();
@@ -54,6 +56,32 @@ public class Population {
 			}
 			populacjaPoczatkowa.add(chromosom);
 		}
+
+//		System.out.println(
+//				"POPULACJA POWINA MIEÆ " + "!!!!! " + pop_size + " !!!!! " + " A MA " + populacjaPoczatkowa.size());
+		return populacjaPoczatkowa;
+	}
+
+	public LinkedList<Chromosom> noweTworzeniePopulacjiPoczatkowej(LinkedList<Integer[]> fenotyp, int pop_size,
+			int chromosom_size) {
+
+		int przedzial = fenotyp.size() / 5;
+		int counter = 0;
+		int powtorzenia = pop_size / 5;
+
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < powtorzenia; j++) {
+				chromosom = new Chromosom();
+				LinkedList<Integer[]> punktPrzestrzeni = new LinkedList<>();
+				for (int chS = 0; chS < chromosom_size; chS++) {
+					Random r = new Random();
+					punktPrzestrzeni.add(fenotyp.get(r.nextInt(przedzial) + (przedzial * i)));
+					chromosom.setChromosomBin(punktPrzestrzeni);
+				}
+				populacjaPoczatkowa.add(chromosom);
+			}
+		}
+
 		return populacjaPoczatkowa;
 	}
 

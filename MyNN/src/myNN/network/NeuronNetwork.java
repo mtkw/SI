@@ -2,7 +2,6 @@ package myNN.network;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -29,6 +28,8 @@ public class NeuronNetwork implements Serializable {
 	FunkcjaPrzystosowania fn = new FunkcjaPrzystosowania();
 	KoloRuletki k = new KoloRuletki();
 	MetodyGenetyczne m = new MetodyGenetyczne();
+
+	private Chromosom najlepszy;
 
 	/**
 	 * @param neuronNetwork
@@ -99,7 +100,7 @@ public class NeuronNetwork implements Serializable {
 
 		for (TreningPattern p : treningPatterns) {
 			this.work(p.getInputArray());
-			blad(p);
+			// blad(p);
 			System.out.println(this);
 
 			int layer = this.neuronNetwork.size();
@@ -113,22 +114,24 @@ public class NeuronNetwork implements Serializable {
 
 	}
 
-	public double blad(TreningPattern treningPattern) {
-		double blad = 0.0;
+	public double blad(TreningPattern treningPatterns) {
+		double bladDlaWzorca = 0.0;
 
 		int layer = this.neuronNetwork.size();
 		SingleLayer sLayer = this.neuronNetwork.get(layer - 1);
 		int neuronCount = sLayer.getNeurons().size();
-		int counter = treningPattern.getOutputArray().length;
 
-		// System.out.println("WYJSCIE " + sLayer.getNeurons().get(0).getOut());
+		int counter = treningPatterns.getOutputArray().length;
+
+		// System.out.println("WYJSCIE " +
+		// sLayer.getNeurons().get(0).getOut());
 		for (int i = 0; i < counter; i++) {
-			blad += Math.abs(treningPattern.getOutputArray()[i] - sLayer.getNeurons().get(i).getOut());
+			bladDlaWzorca += Math.abs(treningPatterns.getOutputArray()[i] - sLayer.getNeurons().get(i).getOut());
 		}
 		// System.out.println(treningPattern.getOutputArray()[0] + " - " +
 		// sLayer.getNeurons().get(0).getOut() + " = " + blad);
 
-		return blad / counter;
+		return bladDlaWzorca / counter;
 	}
 
 	public void networkLearning(ArrayList<TreningPattern> treningPatterns) {
@@ -179,161 +182,197 @@ public class NeuronNetwork implements Serializable {
 	public void genetickNetworkLearning(ArrayList<TreningPattern> treningPatterns) {
 		double error = 0.0;
 		int count = 0;
-		double sredniblad = 0.0;
+		double bladOgolny = 0.0;
 
-		while (count < 10) {
-			// Pierwszy etap utworzenia populacji pocz¹tkowej
-			if (pop.getPopulacja().isEmpty()) {
-				pop.przygotowaniePopulacjiPoczatkowej(65535, 16, 30, 22);
+		// Pierwszy etap utworzenia populacji pocz¹tkowej
+		if (pop.getPopulacja().isEmpty()) {
+//			pop.przygotowaniePopulacjiPoczatkowej(65535, 16, 200, 22);
+			pop.przygotowaniePopulacjiPoczatkowej(130000, 17, 100, 11);
 
-				// Sprawdzenie ka¿dego chromosmu z osobna
-				for (Chromosom ch : pop.getPopulacjaPoczatkowa()) {
-					setWeights(ch);
-					// Sprawdzenie ka¿dego wzorca
-					for (TreningPattern p : treningPatterns) {
-						this.work(p.getInputArray());
-						// error = this.meanSquareError(p.getInputArray());
-						error = this.blad(p);
-					}
-					ch.setError(error);
-					System.out.println("ERROR " + error);
-					// System.out.println("SREDNI " + sredniblad);
-					error = 0.0;
+			// Sprawdzenie ka¿dego chromosmu z osobna
+			for (Chromosom ch : pop.getPopulacjaPoczatkowa()) {
+				setWeights(ch);
+				// Sprawdzenie ka¿dego wzorca
+				for (TreningPattern p : treningPatterns) {
+					this.work(p.getInputArray());
+					error += this.blad(p);
 				}
-				System.out.println("PIERWSZE POKOLENIE " + (sredniblad / 100));
-				// sredniblad = 0.0;
-				// Wyznaczenie wartoœci funkcji przystosowania
-				for (Chromosom ch : pop.getPopulacjaPoczatkowa()) {
-					fn.wyznaczenie_wartoœci_funckji_przystosowania(ch, Constants.ERROR_VALUE);
-				}
-
-				/*
-				 * znalezienie najlepszego osobnika z populacji
-				 */
-
-				// Przygotowanie Ko³a Ruletki i wylosowanie osobników do
-				// dalszych
-				// prac
-
-				k.koloRuletki(pop.getPopulacjaPoczatkowa());
-				// System.out.println("Kolo Ruletki " +
-				// k.getKoloRuletki().size());
-
-				// Podzia³ wylosowanych osobników na pary
-				m.podzia³NaPary(k.getWylosowaneOsobniki());
-
-				// Utworzenie populacji potomków z wylosowanych osobników
-				m.metodyGenetyczne(90, 1, 9, m.getPary2());
-
-				// System.out.println(m.getPotomstwo().size());
-
-				// Zapisanie potomstaw jako nowej populacji do kolejnej iteracji
-				// algorytmu
-				pop.getPopulacja().clear();
-				pop.setPopulacja(m.getPotomstwo());
-				// System.out.println("POPULACJA SIZE " +
-				// pop.getPopulacja().size());
-			} else {
-				// System.out.println("---------------");
-				// Dekodowanie Wag na postaæ dzisiêtn¹
-				for (Chromosom ch : pop.getPopulacja()) {
-					ch.dekodowanieChromosomu();
-				}
-
-				// Sprawdzenie ka¿dego chromosmu z osobna
-				// System.out.println("POP " + pop.getPopulacja().size());
-				for (Chromosom ch : pop.getPopulacja()) {
-					setWeights(ch);
-					// Sprawdzenie ka¿dego wzorca
-					for (TreningPattern p : treningPatterns) {
-						this.work(p.getInputArray());
-						// error += this.meanSquareError(p.getInputArray());
-						error = this.blad(p);
-					}
-					ch.setError(error);
-					sredniblad += error;
-					System.out.println("ERROR " + error);
-					// System.out.println("SREDNI " + sredniblad);
-					error = 0.0;
-				}
-				System.out.println("Kolejne POKOLENIE " + (sredniblad / 100));
-				sredniblad = 0.0;
-
-				// Wyznaczenie wartoœci funkcji przystosowania
-				for (Chromosom ch : pop.getPopulacja()) {
-					fn.wyznaczenie_wartoœci_funckji_przystosowania(ch, Constants.ERROR_VALUE);
-					// if (count == 720) {
-					System.out.println(Constants.ERROR_VALUE + " / " + ch.getError() + " = " + ch.getFn());
-					// }
-				}
-
-				/*
-				 * znalezienie najlepszego osobnika z populacji
-				 */
-				najlepszy(pop.getPopulacja());
-
-				// System.out.println(pop.getPopulacja().size());
-				// Przygotowanie Ko³a Ruletki i wylosowanie osobników do
-				// dalszych
-				// prac
-
-				// Czyszczenie
-				// k.getKoloRuletki().clear();
-				k.getWylosowaneOsobniki().clear();
-				m.getPary2().clear();
-
-				k.koloRuletki(pop.getPopulacja());
-				// System.out.println("Kolo Ruletki " +
-				// k.getKoloRuletki().size());
-				// System.out.println("Wylosowane " +
-				// k.getWylosowaneOsobniki().size());
-				// Podzia³ wylosowanych osobników na pary
-				m.podzia³NaPary(k.getWylosowaneOsobniki());
-
-				// Utworzenie populacji potomków z wylosowanych osobników
-				m.metodyGenetyczne(90, 1, 9, m.getPary2());
-
-				// System.out.println(m.getPotomstwo().size());
-
-				// Zapisanie potomstaw jako nowej populacji do kolejnej iteracji
-				// algorytmu
-				pop.getPopulacja().clear();
-				pop.setPopulacja(m.getPotomstwo());
-				// System.out.println(
-				// "POPULACJA SIZE " + pop.getPopulacja().size() + " Potomstwo "
-				// + m.getPotomstwo().size());
+				// System.out.println("ERROR " + error);
+				// System.out.println("ERROR / SIZE " + error /
+				// treningPatterns.size());
+				ch.setError(error / treningPatterns.size());
 			}
+
+			// Wyznaczenie wartoœci funkcji przystosowania
+			for (Chromosom ch : pop.getPopulacjaPoczatkowa()) {
+				fn.wyznaczenie_wartoœci_funckji_przystosowania(ch, Constants.ERROR_VALUE);
+			}
+
+			// for (Chromosom ch : pop.getPopulacjaPoczatkowa()) {
+			// System.out.println("ERROR " + ch.getError() + " FN " +
+			// ch.getFn());
+			// }
+
+			/*
+			 * znalezienie najlepszego osobnika z populacji
+			 */
+			setNajlepszy(najlepszy(pop.getPopulacjaPoczatkowa()));
+
+			// Przygotowanie Ko³a Ruletki i wylosowanie osobników do
+			// dalszych
+			// prac
+
+			k.koloRuletki(pop.getPopulacjaPoczatkowa());
+			// System.out.println("Kolo Ruletki " +
+			// k.getKoloRuletki().size());
+
+			// Podzia³ wylosowanych osobników na pary
+			m.podzia³NaPary(k.getWylosowaneOsobniki());
+
+			// Utworzenie populacji potomków z wylosowanych osobników
+			m.metodyGenetyczne(84, 1, 15, m.getPary2());
+
+			// System.out.println(m.getPotomstwo().size());
+
+			// Zapisanie potomstaw jako nowej populacji do kolejnej iteracji
+			// algorytmu
+			pop.getPopulacja().clear();
+			pop.setPopulacja(m.getPotomstwo());
+			// m.getPotomstwo().clear();
+			// System.out.println("POPULACJA SIZE " +
+			// pop.getPopulacja().size());
+		}
+		while (najlepszy.getError() >= 0.01 && count <= 600) {
+			// System.out.println("---------------");
+			// Dekodowanie Wag na postaæ dzisiêtn¹
+			for (Chromosom ch : pop.getPopulacja()) {
+				ch.dekodowanieChromosomu();
+			}
+
+			// Sprawdzenie ka¿dego chromosmu z osobna
+			// System.out.println("POP " + pop.getPopulacja().size());
+			for (Chromosom ch : pop.getPopulacja()) {
+				setWeights(ch);
+				error = 0.0;
+				// Sprawdzenie ka¿dego wzorca
+				for (TreningPattern p : treningPatterns) {
+					this.work(p.getInputArray());
+					// error += this.meanSquareError(p.getInputArray());
+					// wyznaczenie b³edu dla danego chromosmu i wszystkich
+					// wzorców ucz¹cych
+					error += this.blad(p);
+				}
+				// System.out.println("ERROR " + error);
+				// System.out.println("ERROR / SIZE " + error /
+				// treningPatterns.size());
+				ch.setError(error / treningPatterns.size());
+
+				// error = 0.0;
+			}
+			// System.out.println("Kolejne POKOLENIE " + (sredniblad /
+			// 100));
+
+			// Wyznaczenie wartoœci funkcji przystosowania
+			for (Chromosom ch : pop.getPopulacja()) {
+				fn.wyznaczenie_wartoœci_funckji_przystosowania(ch, Constants.ERROR_VALUE);
+			//	System.out.println("FUNCKJA PRZYSTOSOWANIA " + ch.getFn() + "ERROR " + ch.getError());
+			}
+
+			/*
+			 * znalezienie najlepszego osobnika z populacji
+			 */
+			setNajlepszy(najlepszy(pop.getPopulacja()));
+			//System.out.println("NAJ NAJ NAJ " + najlepszy.getError());
+
+			// System.out.println(pop.getPopulacja().size());
+			// Przygotowanie Ko³a Ruletki i wylosowanie osobników do
+			// dalszych
+			// prac
+
+			// Czyszczenie
+			// k.getKoloRuletki().clear();
+			k.getWylosowaneOsobniki().clear();
+			m.getPary2().clear();
+
+			k.koloRuletki(pop.getPopulacja());
+//			System.out.println("WYLOSOWANE OSOBNIKI " + k.getWylosowaneOsobniki().size());
+			// for (Chromosom ch : k.getWylosowaneOsobniki()) {
+			// System.out.println(ch.getFn() + "PRAWDOPODOBIENSTWO " +
+			// ch.getPrawdopodobieñstwoWyboru());
+			// }
+			// System.out.println("Najlepszy " + najlepszy.getError());
+			// System.out.println("Kolo Ruletki " +
+			// k.getKoloRuletki().size());
+			// System.out.println("Wylosowane " +
+			// k.getWylosowaneOsobniki().size());
+			// Podzia³ wylosowanych osobników na pary
+			m.podzia³NaPary(k.getWylosowaneOsobniki());
+
+			// Utworzenie populacji potomków z wylosowanych osobników
+			m.metodyGenetyczne(84, 1, 15, m.getPary2());
+
+			// System.out.println(m.getPotomstwo().size());
+
+			// Zapisanie potomstaw jako nowej populacji do kolejnej iteracji
+			// algorytmu
+			pop.getPopulacja().clear();
+			pop.setPopulacja(m.getPotomstwo());
+//			System.out.println("POPULACJA NA KONIEC ETAPU " + pop.getPopulacja().size());
+			// System.out.println(
+			// "POPULACJA SIZE " + pop.getPopulacja().size() + " Potomstwo "
+			// + m.getPotomstwo().size());
 			count++;
 		}
-		System.out.println(pop.getPopulacja().size());
+		System.out.println("Liczba EPOK " + count);
+		System.out.println("NAJMNIEJSZY B£AD " + najlepszy.getError());
+
+		// }System.out.println(error);
+
+		// System.out.println(pop.getPopulacja().size());
 		// setWeights();
 
 		// for (Chromosom ch : pop.getPopulacja()) {
 		// setWeights(ch);
 		// this.work(treningPatterns.get(0).getInputArray());
 
-		System.out.println(this);
-		int layer = this.neuronNetwork.size();
-		SingleLayer sLayer = this.neuronNetwork.get(layer - 1);
-		int neuronCount = sLayer.getNeurons().size();
+		setWeights(najlepszy);
+		for (
 
-		for (Neuron n : sLayer.getNeurons()) {
-			System.out.println(n.getOut());
+		TreningPattern tp : treningPatterns)
+
+		{
+			this.work(tp.getInputArray());
+			System.out.println("!!!!!!!!!!!!!!!!");
+			int layer = this.neuronNetwork.size();
+			SingleLayer sLayer = this.neuronNetwork.get(layer - 1);
+			int neuronCount = sLayer.getNeurons().size();
+
+			for (Neuron n : sLayer.getNeurons()) {
+				System.out.println(n.getOut());
+			}
 		}
-		// System.out.println("!!!!!!!!!!!!!!!!");
-		// }
-	}
+		for (Double d : najlepszy.getChromosomDec()) {
+			System.out.println("WAGA " + d);
+		}
 
-	public void najlepszy(LinkedList<Chromosom> populacja) {
+		// System.out.println("!!!!!!!!!!!!!!!!");
+	}
+	// }
+
+	public Chromosom najlepszy(LinkedList<Chromosom> populacja) {
 		double best = 0.0;
-		Chromosom najlepszy = new Chromosom();
+		najlepszy = new Chromosom();
 		for (Chromosom ch : populacja) {
 			if (ch.getFn() > best) {
 				best = ch.getFn();
 				najlepszy.setFn(ch.getFn());
+				najlepszy.setChromosomDec(ch.getChromosomDec());
+				najlepszy.setError(ch.getError());
 			}
 		}
-		System.out.println("NAJLEPSZY Z POKOLENIA  " + najlepszy.getFn());
+		setNajlepszy(najlepszy);
+//		System.out.println("NAJLEPSZY Z POKOLENIA " + najlepszy.getFn());
+		return najlepszy;
 	}
 
 	/*
@@ -652,6 +691,14 @@ public class NeuronNetwork implements Serializable {
 		}
 
 		return resultAfterLastLayer.toString();
+	}
+
+	public Chromosom getNajlepszy() {
+		return najlepszy;
+	}
+
+	public void setNajlepszy(Chromosom najlepszy) {
+		this.najlepszy = najlepszy;
 	}
 
 }

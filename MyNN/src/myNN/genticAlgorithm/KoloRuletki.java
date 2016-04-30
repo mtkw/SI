@@ -12,9 +12,11 @@ public class KoloRuletki {
 	private Double sredniaWartoscPrzystosowaniaRodzicow = 0.0;
 
 	public void koloRuletki(LinkedList<Chromosom> chromosomy) {
+//		System.out.println("NA WEJŒCIE DO KO£A " + chromosomy.size());
 		prawdopodobienstwoWyboru(chromosomy);
 		przydzielenieMiejscaNaKole(chromosomy);
 		losowanie(chromosomy);
+//		System.out.println("NA WYJŒCIU Z KO£A RULETKI " + wylosowaneOsobniki.size());
 	}
 
 	private void przydzielenieMiejscaNaKole(LinkedList<Chromosom> chromosomy) {
@@ -61,7 +63,7 @@ public class KoloRuletki {
 
 		LinkedList<Double> wylosowaneLiczby = new LinkedList<>();
 
-		while (wylosowaneOsobniki.size() < 30) {
+		while (wylosowaneOsobniki.size() < chromosom.size()) {
 			Random r = new Random();
 			double wylosowanaLiczba = r.nextInt(360);
 			wylosowaneLiczby.add(wylosowanaLiczba);

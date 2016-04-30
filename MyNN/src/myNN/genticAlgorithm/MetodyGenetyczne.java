@@ -13,6 +13,9 @@ public class MetodyGenetyczne {
 	private LinkedList<LinkedList<Chromosom>> pary2 = new LinkedList<>();
 
 	public LinkedList<LinkedList<Chromosom>> podzia³NaPary(LinkedList<Chromosom> pulaRodzicielska) {
+
+//		System.out.println("RODZICE SIZE " + pulaRodzicielska.size());
+
 		int half = pulaRodzicielska.size() / 2;
 		for (int i = 0; i < pulaRodzicielska.size() / 2; i++) {
 			LinkedList<Chromosom> para = new LinkedList<>();
@@ -33,15 +36,18 @@ public class MetodyGenetyczne {
 			int rn = r.nextInt(100);
 
 			if (rn <= pk) {
+//				System.out.println("KRZYZOWANIE");
 				// krzy¿owanie
 				// noweKrzyzowanieProste(pary.get(i));
 				noweKrzyzowanieZlorzone(pary.get(i));
 			} else if (rn > pk && rn <= pk + pr) {
+//				System.out.println("REPRODUKCJA");
 				// Reprodukcja
 				nowaReprodukcja(pary.get(i));
 			} else if (rn > pk + pr) {
+//				System.out.println("MUTACJA");
 				// Mutacja
-				nowaMutacja(pary.get(i), 1);
+				nowaMutacja(pary.get(i), pary.get(i).getFirst().getChromosomBin().size());
 			}
 
 		}
@@ -54,8 +60,10 @@ public class MetodyGenetyczne {
 		Chromosom r1 = paraRodzicielska.getFirst();
 		Chromosom r2 = paraRodzicielska.getLast();
 
-		Random r = new Random();
-		int punktKrzyzowania = r.nextInt(r1.getChromosomBin().size() - 1) + 1;
+		// Random r = new Random();
+		// int punktKrzyzowania = r.nextInt(r1.getChromosomBin().size() - 1) +
+		// 1;
+		int punktKrzyzowania = (r1.getChromosomBin().size() / 2) + 1;
 
 		LinkedList<Integer[]> p1 = new LinkedList<>();
 		LinkedList<Integer[]> p2 = new LinkedList<>();
@@ -75,6 +83,15 @@ public class MetodyGenetyczne {
 
 		potomstwo.add(potomek1);
 		potomstwo.add(potomek2);
+
+		for (Chromosom ch : paraRodzicielska) {
+//			System.out.println("PROSTE RODZIC: " + ch.getChromosomDec());
+		}
+		potomek1.dekodowanieChromosomu();
+		potomek2.dekodowanieChromosomu();
+//		System.out.println("PROSTE POTOMEK " + potomek1.getChromosomDec());
+//		System.out.println("PROSTE POTOMEK " + potomek2.getChromosomDec());
+		// System.out.println("SIZE PARY " + paraRodzicielska.size());
 
 		return potomstwo;
 	}
@@ -127,59 +144,69 @@ public class MetodyGenetyczne {
 		potomstwo.add(potomek1);
 		potomstwo.add(potomek2);
 
+//		for (Chromosom ch : paraRodzicielska) {
+//			System.out.println("RODZIC: " + ch.getChromosomDec());
+//		}
+		potomek1.dekodowanieChromosomu();
+		potomek2.dekodowanieChromosomu();
+//		System.out.println("POTOMEK " + potomek1.getChromosomDec());
+//		System.out.println("POTOMEK " + potomek2.getChromosomDec());
+
 		return potomstwo;
 	}
+
+	// DO POPRAWY MUTACJA!!!!!!!!!!!
 
 	public LinkedList<Chromosom> nowaMutacja(LinkedList<Chromosom> paraRodzicielska, int wagiPodlegaj¹ceMutacji) {
 
 		// Geny podlegaj¹ce mutacji
-		Integer[] gen1 = new Integer[paraRodzicielska.getLast().getChromosomBin().size()];
-		Integer[] gen2 = new Integer[paraRodzicielska.getLast().getChromosomBin().size()];
+//		Integer[] gen1 = new Integer[paraRodzicielska.getFirst().getChromosomBin().get(0).length];
+//		Integer[] gen2 = new Integer[paraRodzicielska.getLast().getChromosomBin().get(0).length];
 
 		LinkedList<Integer[]> noweWagi1 = new LinkedList<>();
 		LinkedList<Integer[]> noweWagi2 = new LinkedList<>();
 
-		if (wagiPodlegaj¹ceMutacji != 1) {
+		if (wagiPodlegaj¹ceMutacji == paraRodzicielska.getFirst().getChromosomBin().size()) {
 
-		} else {
-			Random r = new Random();
-			int numerWagi = r.nextInt(paraRodzicielska.getLast().getChromosomBin().size() - 1);
+			// for (Chromosom ch : paraRodzicielska) {
+			// noweWagi1.clear();
+			// for (int i = 0; i < ch.getChromosomBin().size(); i++) {
+			// for (int j = 0; j < ch.getChromosomBin().get(i).length; j++) {
+			// if (ch.getChromosomBin().get(i)[j] == 0) {
+			// gen1[j] = 1;
+			// } else if (ch.getChromosomBin().get(i)[j] == 1) {
+			// gen1[j] = 0;
+			// }
+			// }
+			// noweWagi1.add(gen1);
+			// }
+			// // System.out.println("WAGI " + noweWagi1.size());
+			// Chromosom ch1 = new Chromosom(noweWagi1);
+			// potomstwo.add(ch1);
+			// }
 
-			gen1 = paraRodzicielska.getFirst().getChromosomBin().get(numerWagi);
-			gen2 = paraRodzicielska.getLast().getChromosomBin().get(numerWagi);
-
-			for (int i = 0; i < gen1.length; i++) {
-				if (gen1[i] == 0) {
-					gen1[i] = 1;
-				} else {
-					gen1[i] = 0;
+			for (Integer[] bin : paraRodzicielska.getFirst().getChromosomBin()) {
+				Integer[] gen1 = new Integer[paraRodzicielska.getFirst().getChromosomBin().get(0).length];
+				for (int i = 0; i < bin.length; i++) {
+					if (bin[i] == 0) {
+						gen1[i] = 1;
+					} else {
+						gen1[i] = 0;
+					}
 				}
+				noweWagi1.add(gen1);
 			}
 
-			for (int i = 0; i < gen2.length; i++) {
-				if (gen2[i] == 0) {
-					gen2[i] = 1;
-				} else {
-					gen2[i] = 0;
+			for (Integer[] bin : paraRodzicielska.getLast().getChromosomBin()) {
+				Integer[] gen2 = new Integer[paraRodzicielska.getLast().getChromosomBin().get(0).length];
+				for (int i = 0; i < bin.length; i++) {
+					if (bin[i] == 0) {
+						gen2[i] = 1;
+					} else {
+						gen2[i] = 0;
+					}
 				}
-			}
-
-			for (int i = 0; i < numerWagi; i++) {
-				noweWagi1.add(paraRodzicielska.getFirst().getChromosomBin().get(i));
-			}
-			noweWagi1.add(gen1);
-
-			for (int i = numerWagi + 1; i < paraRodzicielska.getFirst().getChromosomBin().size(); i++) {
-				noweWagi1.add(paraRodzicielska.getFirst().getChromosomBin().get(i));
-			}
-
-			for (int i = 0; i < numerWagi; i++) {
-				noweWagi2.add(paraRodzicielska.getLast().getChromosomBin().get(i));
-			}
-			noweWagi2.add(gen2);
-
-			for (int i = numerWagi + 1; i < paraRodzicielska.getLast().getChromosomBin().size(); i++) {
-				noweWagi2.add(paraRodzicielska.getLast().getChromosomBin().get(i));
+				noweWagi2.add(gen2);
 			}
 
 			Chromosom ch1 = new Chromosom(noweWagi1);
@@ -188,7 +215,80 @@ public class MetodyGenetyczne {
 			potomstwo.add(ch1);
 			potomstwo.add(ch2);
 
+			// System.out.println("SPRAWDZENIE MUTACJI");
+//			for (Integer[] it : paraRodzicielska.getFirst().getChromosomBin()) {
+//				System.out.println("RODZIC " + Arrays.toString(it));
+//			}
+//			for (Integer[] it : ch1.getChromosomBin()) {
+//				System.out.println("POTOMEK " + Arrays.toString(it));
+//			}
+//
+//			for (Integer[] it : paraRodzicielska.getLast().getChromosomBin()) {
+//				System.out.println("RODZIC " + Arrays.toString(it));
+//			}
+//			for (Integer[] it : ch2.getChromosomBin()) {
+//				System.out.println("POTOMEK " + Arrays.toString(it));
+//			}
+
+			// System.out.println("RODZIC " +
+			// paraRodzicielska.getLast().getChromosomBin());
+			//
+			// System.out.println("POTOMEK " +
+			// potomstwo.getLast().getChromosomBin());
+
+		} else {
+//			Random r = new Random();
+//			int numerWagi = r.nextInt(paraRodzicielska.getLast().getChromosomBin().size() - 1);
+//
+//			gen1 = paraRodzicielska.getFirst().getChromosomBin().get(numerWagi);
+//			gen2 = paraRodzicielska.getLast().getChromosomBin().get(numerWagi);
+//
+//			for (int i = 0; i < gen1.length; i++) {
+//				if (gen1[i] == 0) {
+//					gen1[i] = 1;
+//				} else {
+//					gen1[i] = 0;
+//				}
+//			}
+//
+//			for (int i = 0; i < gen2.length; i++) {
+//				if (gen2[i] == 0) {
+//					gen2[i] = 1;
+//				} else {
+//					gen2[i] = 0;
+//				}
+//			}
+//
+//			for (int i = 0; i < numerWagi; i++) {
+//				noweWagi1.add(paraRodzicielska.getFirst().getChromosomBin().get(i));
+//			}
+//			noweWagi1.add(gen1);
+//
+//			for (int i = numerWagi + 1; i < paraRodzicielska.getFirst().getChromosomBin().size(); i++) {
+//				noweWagi1.add(paraRodzicielska.getFirst().getChromosomBin().get(i));
+//			}
+//
+//			for (int i = 0; i < numerWagi; i++) {
+//				noweWagi2.add(paraRodzicielska.getLast().getChromosomBin().get(i));
+//			}
+//			noweWagi2.add(gen2);
+//
+//			for (int i = numerWagi + 1; i < paraRodzicielska.getLast().getChromosomBin().size(); i++) {
+//				noweWagi2.add(paraRodzicielska.getLast().getChromosomBin().get(i));
+//			}
+//
+//			Chromosom ch1 = new Chromosom(noweWagi1);
+//			Chromosom ch2 = new Chromosom(noweWagi2);
+//
+//			potomstwo.add(ch1);
+//			potomstwo.add(ch2);
+
 		}
+
+		return potomstwo;
+	}
+
+	private LinkedList<Chromosom> nowaMutacjaV2(LinkedList<Chromosom> paraRodzicielska) {
 
 		return potomstwo;
 	}
@@ -267,6 +367,7 @@ public class MetodyGenetyczne {
 	 */
 	public LinkedList<LinkedList<Object[]>> podzialPopulacjiNaPary(LinkedList<Object[]> pulaRodzicielska) {
 
+		System.out.println("RODZICE SIZE " + pulaRodzicielska.size());
 		pary = new LinkedList<>();
 
 		int halfSize = pulaRodzicielska.size() / 2;
