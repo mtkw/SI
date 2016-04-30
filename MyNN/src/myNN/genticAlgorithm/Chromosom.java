@@ -64,7 +64,7 @@ public class Chromosom {
 	public void dekodowanieChromosomu() {
 		for (Integer[] bin : this.chromosomBin) {
 //			this.chromosomDec.add(dekodowanieChromosomu(bin, -2.0, 4.0));
-			this.chromosomDec.add(dekodowanieChromosomu(bin, -6.5, 13.0));
+			this.chromosomDec.add(dekodowanieChromosomu(bin, -13.0, 26.0));
 		}
 	}
 
@@ -79,7 +79,7 @@ public class Chromosom {
 			pot++;
 		}
 		// Ustawienie Iloœci miejsc po przecinku oraz d³ugoœci chromosomu
-		BigDecimal bd = new BigDecimal(pocz¹tekZakresu + (wielkoœæZakresu * xPrim) / (Math.pow(2.0, 17.0) - 1));
+		BigDecimal bd = new BigDecimal(pocz¹tekZakresu + (wielkoœæZakresu * xPrim) / (Math.pow(2.0, 18.0) - 1));
 		BigDecimal rounded = bd.setScale(4, BigDecimal.ROUND_HALF_UP);
 
 		return rounded.doubleValue();

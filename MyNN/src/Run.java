@@ -21,7 +21,7 @@ public class Run {
 		
 //		System.out.println(treningPatterns.get(0).getOutputArray()[0]);
 		treningPatterns.add(new TreningPattern(new double[] { .50d, 0.20d, 1.80d }, new double[] { 1d }));
-//		treningPatterns.add(new TreningPattern(new double[] { 1.33d, 0.20d, 2.80d }, new double[] { 0d }));
+		treningPatterns.add(new TreningPattern(new double[] { 1.33d, 0.20d, 2.80d }, new double[] { 0d }));
 		/*
 		 * Pierwsza wersja schematu nauczania sieci za pomoc¹ algorytmu
 		 * genetycznego

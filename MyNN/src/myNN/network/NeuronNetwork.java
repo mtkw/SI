@@ -186,8 +186,8 @@ public class NeuronNetwork implements Serializable {
 
 		// Pierwszy etap utworzenia populacji pocz¹tkowej
 		if (pop.getPopulacja().isEmpty()) {
-//			pop.przygotowaniePopulacjiPoczatkowej(65535, 16, 200, 22);
-			pop.przygotowaniePopulacjiPoczatkowej(130000, 17, 100, 11);
+			pop.przygotowaniePopulacjiPoczatkowej(260000, 18, 100, 22);
+			//pop.przygotowaniePopulacjiPoczatkowej(130000, 17, 100, 11);
 
 			// Sprawdzenie ka¿dego chromosmu z osobna
 			for (Chromosom ch : pop.getPopulacjaPoczatkowa()) {
@@ -242,7 +242,7 @@ public class NeuronNetwork implements Serializable {
 			// System.out.println("POPULACJA SIZE " +
 			// pop.getPopulacja().size());
 		}
-		while (najlepszy.getError() >= 0.01 && count <= 600) {
+		while (najlepszy.getError() >= 0.01 && count <= 720) {
 			// System.out.println("---------------");
 			// Dekodowanie Wag na postaæ dzisiêtn¹
 			for (Chromosom ch : pop.getPopulacja()) {
